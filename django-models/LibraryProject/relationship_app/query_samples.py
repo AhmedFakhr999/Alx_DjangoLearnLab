@@ -15,7 +15,7 @@ def query_books_by_author(author_name):
     
     try:
         # Get the author object
-        author = Author.objects.get(name__icontains=author_name)
+        author = Author.objects.get(name=author_name)
         
         # Get all books by this author using the ForeignKey reverse relationship
         books = Book.objects.filter(author=author)
@@ -57,7 +57,7 @@ def list_all_books_in_library(library_name):
     
     try:
         # Get the library object
-        library = Library.objects.get(name__icontains=library_name)
+        library = Library.objects.get(name=library_name)
         
         # Get all books in this library using the ManyToMany relationship
         books = library.books.all()
@@ -90,11 +90,11 @@ def retrieve_librarian_for_library(library_name):
     
     try:
         # Get the library object
-        library = Library.objects.get(name__icontains=library_name)
+        library = Library.objects.get(name=library_name)
         
         # Get the librarian using the OneToOne relationship
         # This will raise Librarian.DoesNotExist if no librarian is assigned
-        librarian = library.librarian
+        librarian = Librarian.objects.get(library=library)
         
         print(f"Library: {library.name}")
         print(f"Librarian: {librarian.name}")
