@@ -1,0 +1,45 @@
+<!-- list_books.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>List of Books</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        padding: 8px;
+        margin: 5px 0;
+        background: #f5f5f5;
+        border-left: 4px solid #007bff;
+      }
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>All Books Available:</h1>
+    <ul>
+      {% for book in books %}
+      <li><strong>{{ book.title }}</strong> by {{ book.author.name }}</li>
+      {% empty %}
+      <li>No books available.</li>
+      {% endfor %}
+    </ul>
+    <p><a href="{% url 'library-list' %}">View All Libraries</a></p>
+  </body>
+</html>
