@@ -8,7 +8,7 @@ def list_books(request):
     Function-based view that lists all books in the database.
     """
     # Get all books from database
-    books = Book.objects.select_related('author').all()
+    books = Book.objects.all()
     
     # Render the template with books data
     return render(request, 'relationship_app/list_books.html', {
