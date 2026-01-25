@@ -4,6 +4,7 @@ from django.contrib.auth.views import LoginView, LogoutView  # Add this import
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import login
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Book, Library, Author
@@ -101,9 +102,9 @@ class RegisterView(CreateView):
     success_url = reverse_lazy('relationship_app:login')  # Changed to app-specific login
     
     def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, 'Registration successful! Please log in.')
-        return response
+        user = form.save()
+        login(self.request, user)
+        return redirect('home')
     
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
