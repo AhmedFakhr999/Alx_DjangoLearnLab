@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, TemplateView, CreateView
-from django.contrib.auth.views import LoginView, LogoutView  # Add this import
+from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import login
+from django.contrib.auth import login  # Add this import
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Book, Library, Author
@@ -24,9 +24,7 @@ def list_books(request):
 
 # Class-based view to display all libraries
 class LibraryListView(ListView):
-    """
-    Class-based view that lists all libraries.
-    """
+   
     model = Library
     template_name = 'relationship_app/library_list.html'
     context_object_name = 'libraries'
@@ -35,11 +33,8 @@ class LibraryListView(ListView):
         """Override to prefetch related books and librarian."""
         return Library.objects.prefetch_related('books').all()
 
-# Class-based view to display details of a specific library
 class LibraryDetailView(DetailView):
-    """
-    Class-based view that displays details for a specific library.
-    """
+
     model = Library
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
@@ -99,11 +94,14 @@ class RegisterView(CreateView):
     """User registration view"""
     form_class = UserCreationForm
     template_name = 'relationship_app/register.html'
-    success_url = reverse_lazy('relationship_app:login')  # Changed to app-specific login
+    success_url = reverse_lazy('relationship_app:login')
     
     def form_valid(self, form):
+        # Save the user
         user = form.save()
-        login(self.request, user)
+        # Log the user in automatically after registration
+        login(self.request, user)  # This is the login function being used
+        messages.success(self.request, f'Account created successfully! Welcome {user.username}!')
         return redirect('home')
     
     def get(self, request, *args, **kwargs):
@@ -125,7 +123,7 @@ class ProtectedListView(LoginRequiredMixin, ListView):
     model = Book
     template_name = 'relationship_app/protected_books.html'
     context_object_name = 'books'
-    login_url = 'relationship_app:login'  # Changed to app-specific login
+    login_url = 'relationship_app:login'
     
     def get_queryset(self):
         return Book.objects.select_related('author').all()
