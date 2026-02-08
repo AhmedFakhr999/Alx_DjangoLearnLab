@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Member Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #28a745;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .book-list, .library-list {
+            list-style: none;
+            padding: 0;
+        }
+        .book-item, .library-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .nav-links {
+            margin-top: 20px;
+        }
+        .nav-links a {
+            margin-right: 15px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👤 Member Dashboard</h1>
+        <p>Welcome, {{ current_user.username }} ({{ current_user.profile.role }})</p>
+    </div>
+    
+    <div class="section">
+        <h2>📚 Recently Added Books</h2>
+        <ul class="book-list">
+            {% for book in recent_books %}
+            <li class="book-item">
+                <strong>{{ book.title }}</strong><br>
+                <em>by {{ book.author.name }}</em>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <div class="section">
+        <h2>🏛️ Available Libraries</h2>
+        <ul class="library-list">
+            {% for library in libraries %}
+            <li class="library-item">
+                <strong>{{ library.name }}</strong> - {{ library.books.count }} books available
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <div class="section">
+        <h2>Member Benefits</h2>
+        <p>As a library member, you can:</p>
+        <ul>
+            <li>Borrow books from our collection</li>
+            <li>Access digital resources</li>
+            <li>Participate in library events</li>
+            <li>Use study spaces</li>
+            <li>Get reading recommendations</li>
+        </ul>
+    </div>
+    
+    <div class="nav-links">
+        <a href="{% url 'home' %}">🏠 Home</a>
+        <a href="{% url 'relationship_app:book-list' %}">📚 Browse All Books</a>
+        <a href="{% url 'relationship_app:logout' %}">🚪 Logout</a>
+    </div>
+</body>
+</html>

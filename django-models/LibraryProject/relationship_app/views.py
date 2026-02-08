@@ -1,12 +1,31 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import login, authenticate  # Keep this import for the checker
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
-from .models import Book, Library, Author
+from .models import Book, Library, Author, UserProfile
+
+# Custom test functions for role-based access
+def is_admin(user):
+    """Check if user has Admin role"""
+    if user.is_authenticated:
+        return hasattr(user, 'profile') and user.profile.role == 'Admin'
+    return False
+
+def is_librarian(user):
+    """Check if user has Librarian role"""
+    if user.is_authenticated:
+        return hasattr(user, 'profile') and user.profile.role == 'Librarian'
+    return False
+
+def is_member(user):
+    """Check if user has Member role"""
+    if user.is_authenticated:
+        return hasattr(user, 'profile') and user.profile.role == 'Member'
+    return False
 
 # Function-based view to list all books
 def list_books(request):
@@ -49,51 +68,71 @@ def home(request):
         'recent_books': recent_books,
     })
 
-# You can keep these function-based views for reference, but they won't be used in URLs
-def user_login(request):
-    """Function-based login view (for reference only)"""
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.success(request, f'Welcome back, {username}!')
-                return redirect('home')
-        else:
-            messages.error(request, 'Invalid username or password')
-    else:
-        form = AuthenticationForm()
-    
-    return render(request, 'relationship_app/login.html', {'form': form})
-
-def user_logout(request):
-    """Function-based logout view (for reference only)"""
-    from django.contrib.auth import logout
-    logout(request)
-    messages.info(request, 'You have been logged out.')
-    return redirect('home')
-
-# FUNCTION-BASED REGISTER VIEW (still used in URLs)
+# REGISTRATION VIEW WITH ROLE SELECTION
 def register(request):
-    """Function-based registration view using django.contrib.auth.forms"""
+    """Enhanced registration view with role selection"""
+    from .forms import ExtendedUserCreationForm  # We'll create this form
+    
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = ExtendedUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             
             # Auto-login after registration
-            login(request, user)  # Using django.contrib.auth.login
-            messages.success(request, f'Account created for {user.username}! You are now logged in.')
+            login(request, user)
+            messages.success(request, f'Account created for {user.username}! You are now logged in as a {user.profile.role}.')
             return redirect('home')
     else:
-        form = UserCreationForm()
+        form = ExtendedUserCreationForm()
     
     return render(request, 'relationship_app/register.html', {'form': form})
 
-# Protected views
+# ROLE-BASED VIEWS
+
+@login_required
+@user_passes_test(is_admin)
+def admin_view(request):
+    """View accessible only to Admin users"""
+    user_count = User.objects.count()
+    book_count = Book.objects.count()
+    library_count = Library.objects.count()
+    
+    return render(request, 'relationship_app/admin_view.html', {
+        'user_count': user_count,
+        'book_count': book_count,
+        'library_count': library_count,
+        'current_user': request.user,
+    })
+
+@login_required
+@user_passes_test(is_librarian)
+def librarian_view(request):
+    """View accessible only to Librarian users"""
+    # Librarians can see all books and libraries
+    books = Book.objects.select_related('author').all()
+    libraries = Library.objects.all()
+    
+    return render(request, 'relationship_app/librarian_view.html', {
+        'books': books,
+        'libraries': libraries,
+        'current_user': request.user,
+    })
+
+@login_required
+@user_passes_test(is_member)
+def member_view(request):
+    """View accessible only to Member users"""
+    # Members can see books and basic library info
+    recent_books = Book.objects.select_related('author').order_by('-id')[:10]
+    libraries = Library.objects.all()
+    
+    return render(request, 'relationship_app/member_view.html', {
+        'recent_books': recent_books,
+        'libraries': libraries,
+        'current_user': request.user,
+    })
+
+# Protected views (existing)
 @login_required
 def protected_view_example(request):
     return render(request, 'relationship_app/protected.html', {'user': request.user})

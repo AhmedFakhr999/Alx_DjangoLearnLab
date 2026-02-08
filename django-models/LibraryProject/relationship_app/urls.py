@@ -6,12 +6,14 @@ app_name = 'relationship_app'
 
 urlpatterns = [
     # Authentication URLs using Django's built-in class-based views
-    # The checker wants exactly these patterns
     path('login/', auth_views.LoginView.as_view(template_name='relationship_app/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='relationship_app/logout.html'), name='logout'),
-    
-    # Registration with function-based view
     path('register/', views.register, name='register'),
+    
+    # Role-based views URLs
+    path('admin/', views.admin_view, name='admin_view'),
+    path('librarian/', views.librarian_view, name='librarian_view'),
+    path('member/', views.member_view, name='member_view'),
     
     # Protected example URLs
     path('protected/', views.protected_view_example, name='protected'),

@@ -198,5 +198,24 @@
       <p>Library Management System &copy; {% now "Y" %}</p>
       <p>Built with Django | Using function-based and class-based views</p>
     </div>
+
+    <!-- Add this section to your existing home.html template -->
+<div class="role-navigation">
+    <h2>Role-Based Access</h2>
+    {% if user.is_authenticated %}
+        <p>Your role: <strong>{{ user.profile.role }}</strong></p>
+        <div class="role-links">
+            {% if user.profile.role == 'Admin' %}
+                <a href="{% url 'relationship_app:admin_view' %}" class="btn">👑 Admin Dashboard</a>
+            {% elif user.profile.role == 'Librarian' %}
+                <a href="{% url 'relationship_app:librarian_view' %}" class="btn">📚 Librarian Dashboard</a>
+            {% elif user.profile.role == 'Member' %}
+                <a href="{% url 'relationship_app:member_view' %}" class="btn">👤 Member Dashboard</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>Log in to access role-specific features.</p>
+    {% endif %}
+</div>
   </body>
 </html>
