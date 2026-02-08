@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import UserProfile
+from .models import UserProfile, Book, Author
 
 class ExtendedUserCreationForm(UserCreationForm):
     ROLE_CHOICES = [
@@ -38,3 +38,30 @@ class ExtendedUserCreationForm(UserCreationForm):
             profile.save()
         
         return user
+
+class BookForm(forms.ModelForm):
+    """Form for adding and editing books"""
+    class Meta:
+        model = Book
+        fields = ['title', 'author']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter book title'}),
+            'author': forms.Select(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'title': 'Book Title',
+            'author': 'Author',
+        }
+        help_texts = {
+            'title': 'Enter the full title of the book',
+            'author': 'Select the author from the list or create a new one',
+        }
+
+class AuthorForm(forms.ModelForm):
+    """Form for adding authors (for completeness)"""
+    class Meta:
+        model = Author
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter author name'}),
+        }

@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Author, Book, Library, Librarian
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+from .models import Author, Book, Library, Librarian, UserProfile
 
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
@@ -20,7 +22,7 @@ class BookInline(admin.TabularInline):
 class LibraryAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_librarian', 'get_book_count')
     inlines = [BookInline]
-    exclude = ('books',)  # Exclude the many-to-many field from the main form
+    exclude = ('books',)
     
     def get_librarian(self, obj):
         if hasattr(obj, 'librarian'):
@@ -36,3 +38,29 @@ class LibraryAdmin(admin.ModelAdmin):
 class LibrarianAdmin(admin.ModelAdmin):
     list_display = ('name', 'library')
     list_filter = ('library',)
+
+# Inline for UserProfile in User admin
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = 'Profile'
+
+# Extend User admin
+class CustomUserAdmin(UserAdmin):
+    inlines = (UserProfileInline,)
+    list_display = ('username', 'email', 'first_name', 'last_name', 'get_role', 'is_staff')
+    
+    def get_role(self, obj):
+        if hasattr(obj, 'profile'):
+            return obj.profile.role
+        return "No role"
+    get_role.short_description = 'Role'
+    
+    def get_inline_instances(self, request, obj=None):
+        if not obj:
+            return list()
+        return super().get_inline_instances(request, obj)
+
+# Re-register UserAdmin
+admin.site.unregister(User)
+admin.site.register(User, CustomUserAdmin)

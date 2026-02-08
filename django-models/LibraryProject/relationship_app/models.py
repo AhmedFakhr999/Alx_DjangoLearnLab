@@ -15,6 +15,14 @@ class Book(models.Model):
     
     def __str__(self):
         return f"{self.title} by {self.author.name}"
+    
+    # Add this Meta class with permissions exactly as specified
+    class Meta:
+        permissions = [
+            ("can_add_book", "Can add book"),
+            ("can_change_book", "Can change book"),
+            ("can_delete_book", "Can delete book"),
+        ]
 
 class Library(models.Model):
     name = models.CharField(max_length=255)
@@ -30,7 +38,7 @@ class Librarian(models.Model):
     def __str__(self):
         return f"{self.name} ({self.library.name})"
 
-# New UserProfile model for role-based access
+# UserProfile model for role-based access
 class UserProfile(models.Model):
     ROLE_CHOICES = [
         ('Admin', 'Administrator'),
@@ -52,6 +60,12 @@ class UserProfile(models.Model):
     
     def is_member(self):
         return self.role == 'Member'
+    
+    # Add Meta class here too if needed
+    class Meta:
+        permissions = [
+            ("can_manage_users", "Can manage users"),
+        ]
 
 # Signal to automatically create UserProfile when a new User is created
 @receiver(post_save, sender=User)

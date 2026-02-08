@@ -15,12 +15,23 @@ urlpatterns = [
     path('librarian/', views.librarian_view, name='librarian_view'),
     path('member/', views.member_view, name='member_view'),
     
+    # Book views with custom permissions - function-based
+    path('books/', views.list_books, name='book-list'),
+    path('books/<int:book_id>/', views.book_detail, name='book-detail'),
+    path('books/add/', views.add_book, name='add-book'),
+    path('books/<int:book_id>/edit/', views.edit_book, name='edit-book'),
+    path('books/<int:book_id>/delete/', views.delete_book, name='delete-book'),
+    
+    # Alternative class-based book views
+    path('books/class/add/', views.BookCreateView.as_view(), name='add-book-class'),
+    path('books/class/<int:pk>/edit/', views.BookUpdateView.as_view(), name='edit-book-class'),
+    path('books/class/<int:pk>/delete/', views.BookDeleteView.as_view(), name='delete-book-class'),
+    
     # Protected example URLs
     path('protected/', views.protected_view_example, name='protected'),
     path('protected-books/', views.ProtectedListView.as_view(), name='protected-books'),
     
     # Original URLs
-    path('books/', views.list_books, name='book-list'),
     path('libraries/', views.LibraryListView.as_view(), name='library-list'),
     path('library/<int:pk>/', views.LibraryDetailView.as_view(), name='library-detail'),
     path('library-fn/<int:library_id>/', views.library_detail_function, name='library-detail-fn'),
