@@ -1,13 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, TemplateView, CreateView
-from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic import ListView, DetailView
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Book, Library, Author
-from django.contrib.auth import login
 
 # Function-based view to list all books
 def list_books(request):
@@ -50,7 +48,7 @@ def home(request):
         'recent_books': recent_books,
     })
 
-# FUNCTION-BASED REGISTER VIEW (for checker compatibility)
+# FUNCTION-BASED REGISTER VIEW
 def register(request):
     """Function-based registration view"""
     if request.method == 'POST':
@@ -63,38 +61,6 @@ def register(request):
         form = UserCreationForm()
     
     return render(request, 'relationship_app/register.html', {'form': form})
-
-# Custom Login View
-class CustomLoginView(LoginView):
-    template_name = 'relationship_app/login.html'
-    redirect_authenticated_user = True
-    
-    def get_success_url(self):
-        messages.success(self.request, 'Login successful!')
-        return reverse_lazy('home')
-    
-    def form_invalid(self, form):
-        messages.error(self.request, 'Invalid username or password')
-        return super().form_invalid(form)
-
-# Custom Logout View
-class CustomLogoutView(LogoutView):
-    next_page = 'home'
-    
-    def dispatch(self, request, *args, **kwargs):
-        messages.info(request, 'You have been logged out.')
-        return super().dispatch(request, *args, **kwargs)
-
-# Class-based Register View (alternative - not used in urls.py)
-class RegisterView(CreateView):
-    form_class = UserCreationForm
-    template_name = 'relationship_app/register.html'
-    success_url = reverse_lazy('relationship_app:login')
-    
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, 'Registration successful! Please log in.')
-        return response
 
 # Protected views
 @login_required
