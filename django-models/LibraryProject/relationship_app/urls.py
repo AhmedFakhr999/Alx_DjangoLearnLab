@@ -1,17 +1,16 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from .views import RegisterView  # Only import RegisterView
 
 app_name = 'relationship_app'
 
 urlpatterns = [
-    # Authentication URLs using Django's built-in views
-    path('login/', auth_views.LoginView.as_view(template_name='relationship_app/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='relationship_app/logout.html'), name='logout'),
-    path('register/', views.RegisterView.as_view(), name='register'),
+    # Authentication URLs - using function-based view for register
+    path('login/', views.CustomLoginView.as_view(), name='login'),
+    path('logout/', views.CustomLogoutView.as_view(), name='logout'),
+    path('register/', views.register, name='register'),  # Function-based view
     
-    # Protected example URLs (require login)
+    # Protected example URLs
     path('protected/', views.protected_view_example, name='protected'),
     path('protected-books/', views.ProtectedListView.as_view(), name='protected-books'),
     
