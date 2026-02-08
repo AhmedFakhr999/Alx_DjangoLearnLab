@@ -1,12 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required  # Add permission_required here
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from django.views import View
 from .models import Book, Library, Author, UserProfile
 from .forms import ExtendedUserCreationForm, BookForm
 
@@ -93,6 +92,7 @@ def register(request):
 @user_passes_test(is_admin)
 def admin_view(request):
     """View accessible only to Admin users"""
+    from django.contrib.auth.models import User
     user_count = User.objects.count()
     book_count = Book.objects.count()
     library_count = Library.objects.count()
@@ -130,7 +130,7 @@ def member_view(request):
         'current_user': request.user,
     })
 
-# BOOK VIEWS WITH CUSTOM PERMISSIONS
+# BOOK VIEWS WITH CUSTOM PERMISSIONS USING permission_required decorator
 
 @login_required
 @permission_required('relationship_app.can_view_book', raise_exception=True)
@@ -139,6 +139,7 @@ def book_detail(request, book_id):
     book = get_object_or_404(Book.objects.select_related('author'), id=book_id)
     return render(request, 'relationship_app/book_detail.html', {'book': book})
 
+# USING permission_required decorator for add_book view
 @login_required
 @permission_required('relationship_app.can_add_book', raise_exception=True)
 def add_book(request):
@@ -158,6 +159,7 @@ def add_book(request):
         'action': 'Add'
     })
 
+# USING permission_required decorator for edit_book view
 @login_required
 @permission_required('relationship_app.can_change_book', raise_exception=True)
 def edit_book(request, book_id):
@@ -179,6 +181,7 @@ def edit_book(request, book_id):
         'action': 'Update'
     })
 
+# USING permission_required decorator for delete_book view
 @login_required
 @permission_required('relationship_app.can_delete_book', raise_exception=True)
 def delete_book(request, book_id):
@@ -194,7 +197,6 @@ def delete_book(request, book_id):
     return render(request, 'relationship_app/book_confirm_delete.html', {'book': book})
 
 # Class-based views with permissions (alternative approach)
-
 class BookCreateView(PermissionRequiredMixin, CreateView):
     """Class-based view for adding books with permission check"""
     model = Book
