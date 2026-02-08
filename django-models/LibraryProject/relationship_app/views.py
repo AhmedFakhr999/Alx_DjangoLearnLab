@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate  # Add these imports
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
 from .models import Book, Library, Author
 
@@ -48,15 +49,46 @@ def home(request):
         'recent_books': recent_books,
     })
 
+# FUNCTION-BASED LOGIN VIEW (to use django.contrib.auth.login)
+def user_login(request):
+    """Function-based login view using django.contrib.auth.login"""
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)  # Use django.contrib.auth.login
+                messages.success(request, f'Welcome back, {username}!')
+                return redirect('home')
+        else:
+            messages.error(request, 'Invalid username or password')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'relationship_app/login.html', {'form': form})
+
+# FUNCTION-BASED LOGOUT VIEW
+def user_logout(request):
+    """Function-based logout view"""
+    from django.contrib.auth import logout
+    logout(request)
+    messages.info(request, 'You have been logged out.')
+    return redirect('home')
+
 # FUNCTION-BASED REGISTER VIEW
 def register(request):
-    """Function-based registration view"""
+    """Function-based registration view using django.contrib.auth.forms"""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Registration successful! Please log in.')
-            return redirect('relationship_app:login')
+            user = form.save()
+            
+            # Auto-login after registration
+            login(request, user)  # Use django.contrib.auth.login
+            messages.success(request, f'Account created for {user.username}! You are now logged in.')
+            return redirect('home')
     else:
         form = UserCreationForm()
     
