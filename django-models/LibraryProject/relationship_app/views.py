@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Book, Library, Author
+from django.contrib.auth import login
 
 # Function-based view to list all books
 def list_books(request):
