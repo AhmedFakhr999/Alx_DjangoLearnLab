@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{ title|default:"Book Form" }}</title>
+  </head>
+  <body>
+    <h1>{{ title|default:"Book Form" }}</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">{{ action|default:"Submit" }}</button>
+    </form>
+  </body>
+</html>
