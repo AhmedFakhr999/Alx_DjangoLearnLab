@@ -14,7 +14,6 @@ class CustomUserChangeForm(UserChangeForm):
         model = CustomUser
         fields = ('email', 'username', 'date_of_birth', 'profile_photo')
 
-@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
@@ -53,3 +52,5 @@ class CustomUserAdmin(UserAdmin):
             ),
         }),
     )
+
+admin.site.register(CustomUser, CustomUserAdmin)
