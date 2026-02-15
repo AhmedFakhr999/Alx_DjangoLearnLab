@@ -1,0 +1,67 @@
+<!-- library_detail.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Library Detail</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      h2 {
+        color: #666;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        padding: 10px;
+        margin: 8px 0;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+      }
+      .nav-links {
+        margin-top: 20px;
+      }
+      .nav-links a {
+        margin-right: 15px;
+        color: #007bff;
+        text-decoration: none;
+      }
+      .nav-links a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Library: {{ library.name }}</h1>
+
+    {% if library.librarian %}
+    <p><strong>Librarian:</strong> {{ library.librarian.name }}</p>
+    {% endif %}
+
+    <h2>Books in Library:</h2>
+    {% if library.books.all %}
+    <ul>
+      {% for book in library.books.all %}
+      <li>
+        <strong>{{ book.title }}</strong><br />
+        <em>by {{ book.author.name }}</em>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No books available in this library.</p>
+    {% endif %}
+
+    <div class="nav-links">
+      <a href="{% url 'book-list' %}">View All Books</a>
+      <a href="{% url 'library-list' %}">Back to All Libraries</a>
+    </div>
+  </body>
+</html>

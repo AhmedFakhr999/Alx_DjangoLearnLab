@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Library Management System</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .header {
+        background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 2.5em;
+      }
+      .header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+      .stats {
+        display: flex;
+        justify-content: space-around;
+        margin: 30px 0;
+      }
+      .stat-card {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        flex: 1;
+        margin: 0 10px;
+      }
+      .stat-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #4b6cb7;
+        display: block;
+      }
+      .stat-label {
+        color: #666;
+        font-size: 1.1em;
+      }
+      .nav-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin: 40px 0;
+      }
+      .btn {
+        padding: 15px 30px;
+        background: #4b6cb7;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 1.1em;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+      .btn:hover {
+        background: #3a559f;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      .btn-secondary {
+        background: #6c757d;
+      }
+      .btn-secondary:hover {
+        background: #545b62;
+      }
+      .recent-books {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+      }
+      .recent-books h2 {
+        color: #333;
+        border-bottom: 3px solid #4b6cb7;
+        padding-bottom: 10px;
+      }
+      .book-list {
+        list-style: none;
+        padding: 0;
+      }
+      .book-item {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .book-item:last-child {
+        border-bottom: none;
+      }
+      .book-title {
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+      .book-author {
+        color: #666;
+        font-style: italic;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 50px;
+        color: #666;
+        font-size: 0.9em;
+      }
+      @media (max-width: 768px) {
+        .stats {
+          flex-direction: column;
+        }
+        .stat-card {
+          margin: 10px 0;
+        }
+        .nav-buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+        .btn {
+          width: 100%;
+          max-width: 300px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Add this to your home.html navigation -->
+    <div class="auth-status">
+      {% if user.is_authenticated %}
+      <p>Welcome, <strong>{{ user.username }}</strong>!</p>
+      <a href="{% url 'relationship_app:logout' %}" class="btn">Logout</a>
+      <a href="{% url 'relationship_app:protected' %}" class="btn"
+        >Protected Page</a
+      >
+      {% else %}
+      <p>You are not logged in.</p>
+      <a href="{% url 'relationship_app:login' %}" class="btn">Login</a>
+      <a href="{% url 'relationship_app:register' %}" class="btn">Register</a>
+      {% endif %}
+    </div>
+    <div class="header">
+      <h1>📚 Library Management System</h1>
+      <p>Manage books, libraries, and librarians efficiently</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-number">{{ total_books }}</span>
+        <span class="stat-label">Total Books</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">{{ total_libraries }}</span>
+        <span class="stat-label">Libraries</span>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <a href="{% url 'relationship_app:book-list' %}" class="btn"
+        >📖 View All Books</a
+      >
+      <a href="{% url 'relationship_app:library-list' %}" class="btn"
+        >🏛️ View Libraries</a
+      >
+      <a href="/admin" class="btn btn-secondary">⚙️ Admin Panel</a>
+    </div>
+
+    {% if recent_books %}
+    <div class="recent-books">
+      <h2>📚 Recently Added Books</h2>
+      <ul class="book-list">
+        {% for book in recent_books %}
+        <li class="book-item">
+          <div>
+            <span class="book-title">{{ book.title }}</span>
+            <br />
+            <span class="book-author">by {{ book.author.name }}</span>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="footer">
+      <p>Library Management System &copy; {% now "Y" %}</p>
+      <p>Built with Django | Using function-based and class-based views</p>
+    </div>
+
+    <!-- Add this section to your existing home.html template -->
+<div class="role-navigation">
+    <h2>Role-Based Access</h2>
+    {% if user.is_authenticated %}
+        <p>Your role: <strong>{{ user.profile.role }}</strong></p>
+        <div class="role-links">
+            {% if user.profile.role == 'Admin' %}
+                <a href="{% url 'relationship_app:admin_view' %}" class="btn">👑 Admin Dashboard</a>
+            {% elif user.profile.role == 'Librarian' %}
+                <a href="{% url 'relationship_app:librarian_view' %}" class="btn">📚 Librarian Dashboard</a>
+            {% elif user.profile.role == 'Member' %}
+                <a href="{% url 'relationship_app:member_view' %}" class="btn">👤 Member Dashboard</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p>Log in to access role-specific features.</p>
+    {% endif %}
+</div>
+  </body>
+</html>

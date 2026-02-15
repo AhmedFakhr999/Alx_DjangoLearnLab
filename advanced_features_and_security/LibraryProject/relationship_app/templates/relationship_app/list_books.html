@@ -1,0 +1,83 @@
+<!-- list_books.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Books</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .permission-actions {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f0f8ff;
+            border-radius: 5px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4b6cb7;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .btn-add {
+            background: #28a745;
+        }
+        .book-list {
+            list-style: none;
+            padding: 0;
+        }
+        .book-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f5f5f5;
+            border-left: 4px solid #007bff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .book-actions a {
+            margin-left: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Books Available:</h1>
+    
+    <div class="permission-actions">
+        {% if perms.relationship_app.can_add_book %}
+        <a href="{% url 'relationship_app:add-book' %}" class="btn btn-add">➕ Add New Book</a>
+        {% endif %}
+        
+        <a href="{% url 'relationship_app:book-list' %}" class="btn">📚 Refresh List</a>
+        <a href="{% url 'home' %}" class="btn">🏠 Home</a>
+    </div>
+    
+    <ul class="book-list">
+        {% for book in books %}
+        <li class="book-item">
+            <div>
+                <strong>{{ book.title }}</strong> by {{ book.author.name }}
+            </div>
+            <div class="book-actions">
+                <a href="{% url 'relationship_app:book-detail' book.id %}">👁️ View</a>
+                
+                {% if perms.relationship_app.can_change_book %}
+                <a href="{% url 'relationship_app:edit-book' book.id %}">✏️ Edit</a>
+                {% endif %}
+                
+                {% if perms.relationship_app.can_delete_book %}
+                <a href="{% url 'relationship_app:delete-book' book.id %}">🗑️ Delete</a>
+                {% endif %}
+            </div>
+        </li>
+        {% empty %}
+        <li>No books available.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
