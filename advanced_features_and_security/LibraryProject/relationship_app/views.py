@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required, user_passes_test # Add permission_required here
 from django.contrib.auth.decorators import permission_required
@@ -10,6 +10,8 @@ from django.urls import reverse_lazy
 from .models import Book, Library, Author, UserProfile
 from .forms import ExtendedUserCreationForm, BookForm
 
+
+User = get_user_model()
 # Custom test functions for role-based access
 def is_admin(user):
     """Check if user has Admin role"""

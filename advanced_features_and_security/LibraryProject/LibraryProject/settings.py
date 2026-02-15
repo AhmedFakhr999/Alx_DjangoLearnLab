@@ -14,8 +14,7 @@ from pathlib import Path
 
 import os
 
-
-AUTH_USER_MODEL = 'relationship_app.CustomUser'
+AUTH_USER_MODEL = 'bookshelf.CustomUser'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

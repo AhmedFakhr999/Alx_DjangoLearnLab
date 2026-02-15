@@ -3,8 +3,8 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 from .models import Book, Author, UserProfile
 
-# Get the custom user model
-CustomUser = get_user_model()
+# Get the user model (now points to bookshelf.CustomUser)
+User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
     """
@@ -24,22 +24,10 @@ class CustomUserCreationForm(UserCreationForm):
         help_text='Upload a profile photo (optional)'
     )
     
-    bio = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Tell us about yourself...'}),
-        help_text='Tell us about yourself (max 500 characters)'
-    )
-    
-    phone_number = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your phone number'}),
-        help_text='Your contact phone number'
-    )
-    
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('email', 'username', 'first_name', 'last_name', 
-                 'date_of_birth', 'profile_photo', 'bio', 'phone_number')
+                 'date_of_birth', 'profile_photo')
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -49,8 +37,6 @@ class CustomUserCreationForm(UserCreationForm):
         self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Choose a username'})
         self.fields['first_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Your first name'})
         self.fields['last_name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Your last name'})
-        self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Enter password'})
-        self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm password'})
 
 
 class CustomUserChangeForm(UserChangeForm):
@@ -59,9 +45,9 @@ class CustomUserChangeForm(UserChangeForm):
     """
     
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('email', 'username', 'first_name', 'last_name', 
-                 'date_of_birth', 'profile_photo', 'bio', 'phone_number')
+                 'date_of_birth', 'profile_photo')
 
 
 class ExtendedUserCreationForm(CustomUserCreationForm):
@@ -91,6 +77,7 @@ class ExtendedUserCreationForm(CustomUserCreationForm):
         if commit:
             user.save()
             # Create or update the UserProfile with the selected role
+            # Note: The signal might have already created the profile
             profile, created = UserProfile.objects.get_or_create(user=user)
             profile.role = self.cleaned_data['role']
             profile.save()
@@ -99,35 +86,18 @@ class ExtendedUserCreationForm(CustomUserCreationForm):
 
 
 class BookForm(forms.ModelForm):
-    """Form for adding and editing books"""
-    
     class Meta:
         model = Book
         fields = ['title', 'author']
-        widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter book title'
-            }),
-            'author': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-        }
-        labels = {
-            'title': 'Book Title',
-            'author': 'Author',
-        }
 
 
 class AuthorForm(forms.ModelForm):
-    """Form for adding authors"""
-    
     class Meta:
         model = Author
         fields = ['name']
-        widgets = {
-            'name': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter author name'
-            }),
-        }
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['role']
