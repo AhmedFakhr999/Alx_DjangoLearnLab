@@ -30,23 +30,40 @@ SECRET_KEY = 'django-insecure-aysludwsc+7=qtjdt0$xat9yh790q$u9!yh8^2l)s$(q^9tay(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# Security settings
+# Security Settings for Production Environment
+# ---------------------------------------------
+
+# SECURE_BROWSER_XSS_FILTER: Enables the browser's XSS filter to prevent cross-site scripting attacks.
 SECURE_BROWSER_XSS_FILTER = True
+
+# X_FRAME_OPTIONS: Prevents the site from being framed, protecting against clickjacking.
 X_FRAME_OPTIONS = 'DENY'
+
+# SECURE_CONTENT_TYPE_NOSNIFF: Prevents browsers from MIME-sniffing a response away from the declared content-type.
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# CSRF_COOKIE_SECURE: Ensures that CSRF cookies are only sent over HTTPS.
 CSRF_COOKIE_SECURE = True
+
+# SESSION_COOKIE_SECURE: Ensures that session cookies are only sent over HTTPS.
 SESSION_COOKIE_SECURE = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-# Content Security Policy (CSP)
-# Since django-csp might not be installed, we can set this via middleware or headers.
-# For this task, we'll assume a basic CSP header structure.
-SECURE_HSTS_SECONDS = 31536000 # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# SECURE_SSL_REDIRECT: Redirects all non-HTTPS requests to HTTPS.
 SECURE_SSL_REDIRECT = True
+
+# SECURE_HSTS_SECONDS: Instructs the browser to only access the site via HTTPS for the specified time (1 year).
+SECURE_HSTS_SECONDS = 31536000
+
+# SECURE_HSTS_INCLUDE_SUBDOMAINS: Applies the HSTS policy to all subdomains.
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# SECURE_HSTS_PRELOAD: Allows the site to be included in the browser's HSTS preload list.
+SECURE_HSTS_PRELOAD = True
+
+# SECURE_PROXY_SSL_HEADER: Informs Django that the request is secure if it comes through a proxy with this header.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 
