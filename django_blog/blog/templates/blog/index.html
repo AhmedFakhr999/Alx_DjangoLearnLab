@@ -1,0 +1,11 @@
+{% extends 'blog/base.html' %} {% block content %}
+<h2>Recent Blog Posts</h2>
+{% for post in posts %}
+<article>
+  <h3>{{ post.title }}</h3>
+  <p>By {{ post.author }} on {{ post.published_date }}</p>
+  <p>{{ post.content|truncatewords:30 }}</p>
+</article>
+{% empty %}
+<p>No posts yet. Go to the <a href="/admin">admin panel</a> to add one!</p>
+{% endfor %} {% endblock %}

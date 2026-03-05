@@ -1,14 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.decorators import login_required, user_passes_test # Add permission_required here
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth import login, authenticate, get_user_model
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from .models import Book, Library, Author, UserProfile
 from .forms import ExtendedUserCreationForm, BookForm
+
+# Get the custom user model
+CustomUser = get_user_model()
 
 # Custom test functions for role-based access
 def is_admin(user):
@@ -72,29 +74,49 @@ def home(request):
 
 # REGISTRATION VIEW WITH ROLE SELECTION
 def register(request):
-    """Enhanced registration view with role selection"""
+    """Enhanced registration view with role selection using CustomUser"""
     if request.method == 'POST':
-        form = ExtendedUserCreationForm(request.POST)
+        form = ExtendedUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
             
             # Auto-login after registration
             login(request, user)
-            messages.success(request, f'Account created for {user.username}! You are now logged in as a {user.profile.role}.')
+            messages.success(request, f'Account created for {user.email}! You are now logged in as a {user.profile.role}.')
             return redirect('home')
     else:
         form = ExtendedUserCreationForm()
     
     return render(request, 'relationship_app/register.html', {'form': form})
 
-# ROLE-BASED VIEWS
+# USER PROFILE VIEW
+@login_required
+def user_profile(request):
+    """View for user to see and edit their profile"""
+    user = request.user
+    
+    if request.method == 'POST':
+        from .forms import CustomUserChangeForm
+        form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated!')
+            return redirect('relationship_app:user_profile')
+    else:
+        from .forms import CustomUserChangeForm
+        form = CustomUserChangeForm(instance=user)
+    
+    return render(request, 'relationship_app/user_profile.html', {
+        'form': form,
+        'user': user,
+    })
 
+# ROLE-BASED VIEWS
 @login_required
 @user_passes_test(is_admin)
 def admin_view(request):
     """View accessible only to Admin users"""
-    from django.contrib.auth.models import User
-    user_count = User.objects.count()
+    user_count = CustomUser.objects.count()
     book_count = Book.objects.count()
     library_count = Library.objects.count()
     
@@ -132,7 +154,6 @@ def member_view(request):
     })
 
 # BOOK VIEWS WITH CUSTOM PERMISSIONS USING permission_required decorator
-
 @login_required
 @permission_required('relationship_app.can_view_book', raise_exception=True)
 def book_detail(request, book_id):

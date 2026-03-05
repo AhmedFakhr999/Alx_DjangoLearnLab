@@ -1,5 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
 
 app_name = 'relationship_app'
@@ -10,6 +12,9 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(template_name='relationship_app/logout.html'), name='logout'),
     path('register/', views.register, name='register'),
     
+    # User profile URL
+    path('profile/', views.user_profile, name='user_profile'),
+    
     # Role-based views URLs
     path('admin/', views.admin_view, name='admin_view'),
     path('librarian/', views.librarian_view, name='librarian_view'),
@@ -18,8 +23,6 @@ urlpatterns = [
     # Book views with custom permissions - function-based
     path('books/', views.list_books, name='book-list'),
     path('books/<int:book_id>/', views.book_detail, name='book-detail'),
-    
-    # ADD THESE EXACT PATHS FOR THE CHECKER
     path('add_book/', views.add_book, name='add_book'),
     path('edit_book/<int:book_id>/', views.edit_book, name='edit_book'),
     path('delete_book/<int:book_id>/', views.delete_book, name='delete_book'),
@@ -38,3 +41,7 @@ urlpatterns = [
     path('library/<int:pk>/', views.LibraryDetailView.as_view(), name='library-detail'),
     path('library-fn/<int:library_id>/', views.library_detail_function, name='library-detail-fn'),
 ]
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
