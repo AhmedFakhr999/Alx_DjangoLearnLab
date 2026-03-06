@@ -1,10 +1,32 @@
-{% extends "blog/base.html" %}
-{% block content %}
-  {% for post in posts %}
-    <div class="post">
-      <h2><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h2>
-      <p>{{ post.content|truncatewords:30 }}</p>
-      <small>By {{ post.author }} on {{ post.published_date }}</small>
-    </div>
-  {% endfor %}
-{% endblock %}
+{% extends "blog/base.html" %} {% block content %} {% for post in posts %}
+<div class="post">
+  <h2><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h2>
+  <p>{{ post.content|truncatewords:30 }}</p>
+  <small>By {{ post.author }} on {{ post.published_date }}</small>
+</div>
+<hr />
+<h3>Comments</h3>
+{% for comment in post.comments.all %}
+<div class="comment">
+  <p><strong>{{ comment.author }}</strong> said:</p>
+  <p>{{ comment.content }}</p>
+  <small>Posted on {{ comment.created_at }}</small>
+  {% if comment.author == user %}
+  <a href="{% url 'edit-comment' comment.pk %}">Edit</a>
+  <a href="{% url 'delete-comment' comment.pk %}">Delete</a>
+  {% endif %}
+</div>
+{% empty %}
+<p>No comments yet.</p>
+{% endfor %}
+
+<hr />
+{% if user.is_authenticated %}
+<h4>Add a comment:</h4>
+<form method="post" action="{% url 'add-comment' post.pk %}">
+  {% csrf_token %} {{ comment_form.as_p }}
+  <button type="submit">Post Comment</button>
+</form>
+{% else %}
+<p><a href="{% url 'login' %}">Log in</a> to leave a comment.</p>
+{% endif %} {% endfor %} {% endblock %}
