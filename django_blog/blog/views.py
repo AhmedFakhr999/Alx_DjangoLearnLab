@@ -9,6 +9,8 @@ from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from .models import Comment
 from .forms import CommentForm
+from django.db.models import Q
+from taggit.models import Tag
 def index(request):
     posts = Post.objects.all().order_by('-published_date')
     return render(request, 'blog/index.html', {'posts': posts})
@@ -128,3 +130,31 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return self.object.post.get_absolute_url()
+    
+
+
+# Update your PostListView to handle search or create a separate Search view
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+def search(request):
+    query = request.GET.get('q')
+    if query:
+        posts = Post.objects.filter(
+            Q(title__icontains=query) | 
+            Q(content__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+    else:
+        posts = Post.objects.none()
+    return render(request, 'blog/search_results.html', {'posts': posts, 'query': query})
+
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(tags__name__in=[self.kwargs['tag_slug']])

@@ -12,6 +12,10 @@
       <nav>
         <a href="/">Home</a>
       </nav>
+      <form action="{% url 'search' %}" method="get">
+        <input type="text" name="q" placeholder="Search posts or tags..." />
+        <button type="submit">Search</button>
+      </form>
     </header>
 
     <main>{% block content %} {% endblock %}</main>

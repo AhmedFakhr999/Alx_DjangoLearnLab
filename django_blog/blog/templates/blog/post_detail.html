@@ -3,6 +3,11 @@
   <h2><a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></h2>
   <p>{{ post.content|truncatewords:30 }}</p>
   <small>By {{ post.author }} on {{ post.published_date }}</small>
+  <div class="tags">
+    {% for tag in post.tags.all %}
+        <a href="{% url 'posts-by-tag' tag.slug %}" class="badge">{{ tag.name }}</a>
+    {% endfor %}
+</div>
 </div>
 <hr />
 <h3>Comments</h3>
