@@ -11,6 +11,7 @@ from .models import Comment
 from .forms import CommentForm
 from django.db.models import Q
 from taggit.models import Tag
+
 def index(request):
     posts = Post.objects.all().order_by('-published_date')
     return render(request, 'blog/index.html', {'posts': posts})
@@ -114,10 +115,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user == comment.author
     
     
-from django.views.generic import CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Post, Comment
-from .forms import CommentForm
+
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
@@ -158,3 +156,17 @@ class PostByTagListView(ListView):
 
     def get_queryset(self):
         return Post.objects.filter(tags__name__in=[self.kwargs['tag_slug']])
+    
+
+
+# Search Logic
+
+# Tag Filtering View
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        tag_name = self.kwargs.get('tag_name')
+        return Post.objects.filter(tags__name__icontains=tag_name)

@@ -34,4 +34,11 @@
 </form>
 {% else %}
 <p><a href="{% url 'login' %}">Log in</a> to leave a comment.</p>
+
+
+<div class="tags">
+    {% for tag in post.tags.all %}
+        <a href="{% url 'post-tags' tag.name %}">#{{ tag.name }}</a>
+    {% endfor %}
+</div>
 {% endif %} {% endfor %} {% endblock %}
